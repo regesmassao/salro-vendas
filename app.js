@@ -17,7 +17,7 @@
 'use strict';
 
 /* ============ Constantes ============ */
-var APP_VERSION = '1.0';
+var APP_VERSION = '1.1';
 var LS_KEY = 'ven-state';
 var DEFAULT_PRODUCT = 'Miniguia — Chegada ao Japão sem perrengue';
 var CHANNELS = { kiwify: 'Kiwify', hotmart: 'Hotmart', eduzz: 'Eduzz' };
@@ -493,12 +493,40 @@ function extractState(raw) {
   }
   return raw;
 }
+/* Resumo que a Salro Central exibe: calculado pelo próprio app, com
+   a matemática de breakdown (centavos inteiros). vendasMes conta só
+   as vendas cuja data cai no mês de referência; totais conta todas. */
+function resumoShape(t) {
+  return {
+    qtd: t.count, bruto: t.gross, liquido: t.netPlataforma,
+    reserva: t.reserva, lucro: t.lucro
+  };
+}
+function buildResumo(state, refISO) {
+  var s = sanitizeState(state);
+  var ref = validISODate(refISO) ? refISO : todayISO();
+  var mes = ref.slice(0, 7);
+  var doMes = s.vendas.filter(function (v) {
+    return String(v.date || '').slice(0, 7) === mes;
+  });
+  return {
+    mes: mes,
+    vendasMes: resumoShape(totals(doMes, s.config)),
+    totais: resumoShape(totals(s.vendas, s.config))
+  };
+}
 function buildBackupPayload(state) {
+  var s = sanitizeState(state);
+  var data = {
+    vendas: s.vendas, despesas: s.despesas, saques: s.saques,
+    campanhas: s.campanhas, config: s.config,
+    resumo: buildResumo(s)
+  };
   return {
     app: 'salro-vendas',
     version: 1,
     exportedAt: new Date().toISOString(),
-    data: sanitizeState(state)
+    data: data
   };
 }
 /* Junta por id (nunca apaga): item importado com id já existente
@@ -531,7 +559,39 @@ function mergeImport(existing, incomingRaw) {
   };
 }
 
-/* ============ Persistência (navegador) ============ */
+/* Junção da NUVEM — semântica diferente do mergeImport de arquivo:
+   item da nuvem com id novo entra; id já existente mantém a versão
+   LOCAL; nada é apagado; a config fica a local (é preferência do
+   aparelho, não dado). */
+function mergeCloudDownload(existing, incomingRaw) {
+  var cur = sanitizeState(existing);
+  var inc = sanitizeState(extractState(incomingRaw));
+  var added = 0;
+  function addOnly(curList, incList) {
+    var ids = {};
+    curList.forEach(function (it) { ids[it.id] = true; });
+    var out = curList.slice();
+    incList.forEach(function (it) {
+      if (!ids[it.id]) { out.push(it); ids[it.id] = true; added++; }
+    });
+    return out;
+  }
+  return {
+    state: {
+      vendas: addOnly(cur.vendas, inc.vendas),
+      despesas: addOnly(cur.despesas, inc.despesas),
+      saques: addOnly(cur.saques, inc.saques),
+      campanhas: addOnly(cur.campanhas, inc.campanhas),
+      config: cur.config
+    },
+    added: added
+  };
+}
+/* Trava de segurança do envio: nunca sobrescrever em silêncio um
+   backup da nuvem com MAIS vendas por um aparelho com MENOS. */
+function shouldBlockUpload(localCount, remoteCount) {
+  return (Number(remoteCount) || 0) > (Number(localCount) || 0);
+}
 var state = sanitizeState(null);
 function loadState() {
   try {
@@ -967,6 +1027,154 @@ function bindEvents() {
     saveState(); fillConfigForm(); renderAll();
     alert('Importação concluída: ' + res.added + ' novo(s), ' + res.updated + ' atualizado(s). Nada foi apagado.');
   });
+
+  /* Nuvem (Google Drive) */
+  $('driveSave').addEventListener('click', function () { driveSaveConfig(); });
+  $('driveUp').addEventListener('click', function () { driveUpload(false); });
+  $('driveUpForce').addEventListener('click', function () { driveUpload(true); });
+  $('driveDown').addEventListener('click', function () { driveDownload(); });
+}
+
+/* ============ Nuvem (Google Drive) ============ */
+/* Mesma ponte dos outros apps Salro: um Apps Script na conta Google
+   dele guarda UM arquivo de backup no Drive (salro-vendas-nuvem.json).
+   GET ?key=&action=read devolve {ok, exists, updatedAt, data};
+   POST ?key=&action=write (corpo = o JSON do backup, como texto puro,
+   pra não disparar preflight de CORS) devolve {ok, updatedAt}.
+   Link e chave ficam salvos só neste aparelho (ven-driveUrl/
+   ven-driveKey, chaves separadas do ven-state) — NUNCA entram no
+   payload do backup. */
+function driveConfig() {
+  return {
+    url: String(localStorage.getItem('ven-driveUrl') || '').trim(),
+    key: String(localStorage.getItem('ven-driveKey') || '').trim()
+  };
+}
+function driveApiUrl(action) {
+  var c = driveConfig();
+  var sep = c.url.indexOf('?') >= 0 ? '&' : '?';
+  return c.url + sep + 'key=' + encodeURIComponent(c.key) + '&action=' + action;
+}
+function driveSetStatus(msg) {
+  var el = $('driveStatus');
+  if (el) el.textContent = msg;
+}
+function driveFmtWhen(ts) {
+  var n = Number(ts || 0);
+  return n > 0 ? new Date(n).toLocaleString('pt-BR') : 'nunca';
+}
+function driveRenderSync() {
+  var el = $('driveSync');
+  if (!el) return;
+  el.textContent = 'Envio: ' + driveFmtWhen(localStorage.getItem('ven-driveLastUp')) +
+    ' · Baixa: ' + driveFmtWhen(localStorage.getItem('ven-driveLastDown'));
+}
+function fillDriveForm() {
+  var u = $('driveUrl'), k = $('driveKey');
+  if (u) u.value = localStorage.getItem('ven-driveUrl') || '';
+  if (k) k.value = localStorage.getItem('ven-driveKey') || '';
+  driveRenderSync();
+}
+function driveSaveConfig() {
+  localStorage.setItem('ven-driveUrl', String($('driveUrl').value || '').trim());
+  localStorage.setItem('ven-driveKey', String($('driveKey').value || '').trim());
+  driveShowForce(false);
+  driveSetStatus('✔️ Link e chave salvos neste aparelho.');
+}
+function driveFetchJson(url, options) {
+  var p;
+  try { p = fetch(url, options); } catch (e) { p = Promise.reject(e); }
+  return p.then(function (res) {
+    return res.json().catch(function () { return null; });
+  }).then(function (body) {
+    if (!body || body.ok !== true) {
+      if (body && body.error === 'unauthorized') throw new Error('unauthorized');
+      throw new Error('network');
+    }
+    return body;
+  }).catch(function (e) {
+    if (e && e.message === 'unauthorized') throw e;
+    throw new Error('network');
+  });
+}
+function driveErrorAlert(e) {
+  alert(e && e.message === 'unauthorized'
+    ? '❌ O script recusou a chave. Confira se a chave salva aqui é igual à chave do script.'
+    : '❌ Não consegui falar com o script. Confira o link e a conexão com a internet.');
+}
+function driveShowForce(show) {
+  var b = $('driveUpForce');
+  if (b) b.classList.toggle('hidden', !show);
+}
+/* Enviar: antes de escrever, lê a nuvem. Se lá houver MAIS vendas
+   que neste aparelho, trava e pede a confirmação explícita do botão
+   "Enviar mesmo assim" (trava do ecossistema: backup maior nunca é
+   sobrescrito em silêncio por um menor). */
+function driveUpload(force) {
+  var c = driveConfig();
+  if (!c.url || !c.key) { alert('Primeiro cole o link do script e a chave secreta, e toque em Salvar.'); return; }
+  driveShowForce(false);
+  driveSetStatus('Consultando a nuvem antes de enviar…');
+  driveFetchJson(driveApiUrl('read'), { method: 'GET' }).then(function (r) {
+    if (!force && r.exists && r.data) {
+      if (r.data.app !== 'salro-vendas') {
+        driveSetStatus('⚠️ O que está na nuvem não parece um backup do Salro Vendas. ' +
+          'Para sobrescrever mesmo assim, toque em "Enviar mesmo assim".');
+        driveShowForce(true);
+        return;
+      }
+      var remoteCount = sanitizeState(extractState(r.data)).vendas.length;
+      if (shouldBlockUpload(state.vendas.length, remoteCount)) {
+        driveSetStatus('⚠️ A nuvem tem ' + remoteCount + ' venda(s) e este aparelho tem ' +
+          state.vendas.length + '. Enviar agora substituiria o backup maior pelo menor. ' +
+          'Baixe da nuvem e junte primeiro — ou toque em "Enviar mesmo assim" se tiver certeza.');
+        driveShowForce(true);
+        return;
+      }
+    }
+    driveSetStatus('Enviando pra nuvem…');
+    return driveFetchJson(driveApiUrl('write'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(buildBackupPayload(state))
+    }).then(function () {
+      localStorage.setItem('ven-driveLastUp', String(Date.now()));
+      driveSetStatus('✔️ Backup enviado pra nuvem com ' + state.vendas.length +
+        (state.vendas.length === 1 ? ' venda.' : ' vendas.'));
+      driveRenderSync();
+    });
+  }).catch(function (e) {
+    driveSetStatus('');
+    driveErrorAlert(e);
+  });
+}
+/* Baixar e juntar: merge por id que só ACRESCENTA (a versão local de
+   um id existente vence), nunca apaga, e a config fica a local. */
+function driveDownload() {
+  var c = driveConfig();
+  if (!c.url || !c.key) { alert('Primeiro cole o link do script e a chave secreta, e toque em Salvar.'); return; }
+  driveShowForce(false);
+  driveSetStatus('Consultando a nuvem…');
+  driveFetchJson(driveApiUrl('read'), { method: 'GET' }).then(function (r) {
+    if (!r.exists || !r.data) {
+      driveSetStatus('Ainda não há backup na nuvem. Envie o primeiro pelo botão de enviar.');
+      return;
+    }
+    if (!r.data || typeof r.data !== 'object' || r.data.app !== 'salro-vendas') {
+      driveSetStatus('❌ O que veio da nuvem não é um backup do Salro Vendas. Nada foi alterado.');
+      return;
+    }
+    var res = mergeCloudDownload(state, r.data);
+    state = res.state;
+    saveState();
+    localStorage.setItem('ven-driveLastDown', String(Date.now()));
+    driveRenderSync();
+    renderAll();
+    driveSetStatus('✔️ Baixado da nuvem: ' + res.added + ' novo(s) juntado(s). Nada foi apagado.');
+  }).catch(function (e) {
+    driveSetStatus('');
+    driveErrorAlert(e);
+  });
 }
 
 /* Rodapé de versão: "Salro Vendas · versão X.Y" no fim das telas
@@ -1001,6 +1209,7 @@ function init() {
   state = loadState();
   bindEvents();
   fillConfigForm();
+  fillDriveForm();
   renderAll();
   showView('home');
   if ('serviceWorker' in navigator) {
@@ -1034,6 +1243,8 @@ if (typeof module !== 'undefined' && module.exports) {
     sanitizeConfig: sanitizeConfig, sanitizeVenda: sanitizeVenda,
     sanitizeDespesa: sanitizeDespesa, sanitizeSaque: sanitizeSaque,
     sanitizeState: sanitizeState, buildBackupPayload: buildBackupPayload,
+    buildResumo: buildResumo, mergeCloudDownload: mergeCloudDownload,
+    shouldBlockUpload: shouldBlockUpload,
     mergeImport: mergeImport, renderVersionFooter: renderVersionFooter
   };
 }
