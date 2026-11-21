@@ -273,6 +273,25 @@
     </div>
 
     <div class="card">
+      <h2>☁️ Nuvem (Google Drive)</h2>
+      <p class="muted">Backup na sua conta Google, pela mesma ponte dos outros apps Salro: um script guarda o backup no Drive e a Salro Central lê dele. O link e a chave ficam salvos só neste aparelho — nunca entram no backup. Enviar tem trava de segurança: se a nuvem tiver mais vendas que este aparelho, o app pede confirmação antes de sobrescrever.</p>
+      <div class="field">
+        <label for="driveUrl">Link do script</label>
+        <input id="driveUrl" type="url" placeholder="Cole o link do script (termina em /exec)">
+      </div>
+      <div class="field">
+        <label for="driveKey">Chave secreta</label>
+        <input id="driveKey" type="text" placeholder="A mesma chave colocada no script">
+      </div>
+      <button id="driveSave" class="big" type="button">Salvar link e chave</button>
+      <button id="driveUp" class="primary big mt" type="button">⬆️ Enviar para a nuvem</button>
+      <button id="driveUpForce" class="big mt hidden" type="button">⚠️ Enviar mesmo assim</button>
+      <button id="driveDown" class="big mt" type="button">⬇️ Baixar da nuvem e juntar</button>
+      <p class="muted mt" id="driveSync"></p>
+      <p class="muted" id="driveStatus"></p>
+    </div>
+
+    <div class="card">
       <h2>Backup</h2>
       <p class="muted">Exporte o backup em JSON e guarde. Para restaurar ou juntar outro aparelho, cole o JSON (ou escolha o arquivo) e toque em Importar — a importação junta por id e nunca apaga o que já existe.</p>
       <div class="row gap">

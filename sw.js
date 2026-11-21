@@ -1,5 +1,5 @@
 /* Salro Vendas — service worker: network-first, offline fallback */
-const CACHE = 'salro-vendas-v1-0';
+const CACHE = 'salro-vendas-v1-1';
 const SHELL = [
   './',
   './index.html',
