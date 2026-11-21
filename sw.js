@@ -6,8 +6,8 @@ const SHELL = [
   './app.js',
   './styles.css',
   './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png'
+  './IMG_6787.png',
+  './IMG_6786.png'
 ];
 
 self.addEventListener('install', (event) => {
