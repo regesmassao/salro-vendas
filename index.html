@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#091835">
+<title>Salro Vendas</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">✦ Salro Vendas</div>
+</header>
+
+<main>
+  <!-- INÍCIO / PAINEL -->
+  <section id="view-home" class="view">
+    <div class="card">
+      <h2>Painel de vendas</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="kpi-value" id="kpiVendasCount">0</div><div class="kpi-label">vendas</div></div>
+        <div class="kpi"><div class="kpi-value" id="kpiVendasGross">R$ 0,00</div><div class="kpi-label">bruto total</div></div>
+        <div class="kpi"><div class="kpi-value" id="kpiTaxas">R$ 0,00</div><div class="kpi-label">taxas das plataformas</div></div>
+        <div class="kpi"><div class="kpi-value" id="kpiLiquido">R$ 0,00</div><div class="kpi-label">líquido plataforma</div></div>
+        <div class="kpi"><div class="kpi-value" id="kpiReserva">R$ 0,00</div><div class="kpi-label" id="kpiReservaPct">Reserva de imposto</div></div>
+        <div class="kpi"><div class="kpi-value accent" id="kpiLucro">R$ 0,00</div><div class="kpi-label">lucro líquido</div></div>
+        <div class="kpi"><div class="kpi-value" id="kpiAds">R$ 0,00</div><div class="kpi-label">gasto em anúncios (R$)</div></div>
+        <div class="kpi"><div class="kpi-value accent" id="kpiLucroApos">R$ 0,00</div><div class="kpi-label">lucro após anúncios</div></div>
+      </div>
+    </div>
+
+    <div class="card experiment">
+      <h2>🧪 Experimento</h2>
+      <div class="exp-count" id="expCount">0 vendas registradas</div>
+      <p class="muted">Meta do experimento: primeira venda até 22/12/2026.</p>
+    </div>
+
+    <div class="card">
+      <h2>Lucro líquido por mês</h2>
+      <p class="muted">Últimos 6 meses — toque numa barra para ver o valor exato.</p>
+      <div id="monthBars" class="bars"></div>
+    </div>
+
+    <h2 class="sectitle">Por produto</h2>
+    <div id="byProduct"></div>
+
+    <h2 class="sectitle">Por campanha</h2>
+    <div id="byCampaign"></div>
+
+    <div class="card">
+      <h2>Últimas vendas</h2>
+      <div id="lastSales"></div>
+    </div>
+    <div class="app-version"></div>
+  </section>
+
+  <!-- VENDAS -->
+  <section id="view-vendas" class="view hidden">
+    <div class="card">
+      <h2 id="vendaFormTitle">Registrar venda</h2>
+      <p class="muted hidden" id="editNote">Editando uma venda — salve ou <button class="linkbtn" id="btnCancelEdit" type="button">cancele a edição</button>.</p>
+      <div class="field">
+        <label for="vDate">Data</label>
+        <input id="vDate" type="date">
+      </div>
+      <div class="field">
+        <label for="vProduct">Produto</label>
+        <input id="vProduct" type="text">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="vChannel">Canal</label>
+          <select id="vChannel">
+            <option value="kiwify">Kiwify</option>
+            <option value="hotmart">Hotmart</option>
+            <option value="eduzz">Eduzz</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="vGross">Valor bruto (R$)</label>
+          <input id="vGross" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="field">
+        <label for="vCampaign">Campanha (opcional)</label>
+        <select id="vCampaign"><option value="">Sem campanha</option></select>
+      </div>
+      <button id="btnAddVenda" class="primary big" type="button">Adicionar venda</button>
+    </div>
+
+    <div class="card">
+      <h2>📥 Importar da plataforma</h2>
+      <p class="muted">Exporte o relatório de vendas da plataforma (CSV) e importe aqui: o app reconhece as colunas, importa só as vendas aprovadas e já faz a conta completa. Importar de novo o mesmo relatório não duplica.</p>
+      <div class="field">
+        <label for="impChannel">Plataforma do relatório</label>
+        <select id="impChannel">
+          <option value="kiwify">Kiwify</option>
+          <option value="hotmart">Hotmart</option>
+          <option value="eduzz">Eduzz</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="impFile">Arquivo CSV do relatório</label>
+        <input id="impFile" type="file" accept=".csv,text/csv">
+      </div>
+      <div class="field">
+        <label for="impText">…ou cole o conteúdo do CSV</label>
+        <textarea id="impText" rows="4" placeholder="Data;Produto;Valor;Status;Transação&#10;..."></textarea>
+      </div>
+      <button id="btnImportSales" class="primary big" type="button">Importar vendas</button>
+      <p class="muted" id="impResult"></p>
+    </div>
+
+    <div class="card">
+      <h2>Vendas</h2>
+      <div id="salesList"></div>
+    </div>
+  </section>
+
+  <!-- ANÚNCIOS -->
+  <section id="view-anuncios" class="view hidden">
+    <div class="card">
+      <h2>Nova campanha</h2>
+      <div class="field">
+        <label for="aNome">Nome da campanha</label>
+        <input id="aNome" type="text" placeholder="Ex.: Meta Ads — semana 3">
+      </div>
+      <div class="field">
+        <label for="aProduto">Produto</label>
+        <input id="aProduto" type="text">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="aInicio">Início</label>
+          <input id="aInicio" type="date">
+        </div>
+        <div class="field">
+          <label for="aFim">Fim (opcional)</label>
+          <input id="aFim" type="date">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="aMoeda">Moeda do gasto</label>
+          <select id="aMoeda">
+            <option value="BRL">R$ (real)</option>
+            <option value="JPY">¥ (iene)</option>
+            <option value="USD">US$ (dólar)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="aGasto">Gasto</label>
+          <input id="aGasto" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="field">
+        <label for="aRate">Taxa para R$ (opcional) — quanto 1 unidade da moeda vale em R$</label>
+        <input id="aRate" type="number" inputmode="decimal" min="0" step="0.0001" placeholder="Ex.: 0,038 para ¥">
+      </div>
+      <button id="btnAddCampanha" class="primary big" type="button">Adicionar campanha</button>
+    </div>
+
+    <div class="card">
+      <h2>Campanhas</h2>
+      <p class="muted" id="unattributedLine">Vendas sem atribuição: 0</p>
+      <div id="campaignList"></div>
+    </div>
+  </section>
+
+  <!-- DESPESAS -->
+  <section id="view-despesas" class="view hidden">
+    <div class="card">
+      <h2>Registrar despesa</h2>
+      <div class="field">
+        <label for="dDate">Data</label>
+        <input id="dDate" type="date">
+      </div>
+      <div class="field">
+        <label for="dDesc">Descrição</label>
+        <input id="dDesc" type="text" placeholder="Ex.: anúncio, ferramenta, contador…">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="dCurrency">Moeda</label>
+          <select id="dCurrency">
+            <option value="BRL">R$ (real)</option>
+            <option value="JPY">¥ (iene)</option>
+            <option value="USD">US$ (dólar)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dAmount">Valor</label>
+          <input id="dAmount" type="number" inputmode="decimal" step="0.01">
+        </div>
+      </div>
+      <button id="btnAddDespesa" class="primary big" type="button">Adicionar despesa</button>
+    </div>
+
+    <div class="card">
+      <h2>Despesas</h2>
+      <div id="expTotals" class="grid3"></div>
+      <div id="expList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Saques</h2>
+      <div class="field">
+        <label for="sDate">Data</label>
+        <input id="sDate" type="date">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="sAmount">Valor sacado (R$)</label>
+          <input id="sAmount" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="sFee">Taxa do saque (R$)</label>
+          <input id="sFee" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <button id="btnAddSaque" class="primary big" type="button">Registrar saque</button>
+      <div id="saqueTotals" class="grid3 mt"></div>
+      <div id="saqueList"></div>
+    </div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="view-ajustes" class="view hidden">
+    <div class="card">
+      <h2>Imposto e taxas</h2>
+      <div class="field">
+        <label for="cTaxPct">Reserva de imposto (% do líquido da plataforma)</label>
+        <input id="cTaxPct" type="number" inputmode="decimal" min="0" max="100" step="0.5">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="cKiwifyPct">Kiwify — taxa (%)</label>
+          <input id="cKiwifyPct" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="cKiwifyFixed">Kiwify — fixo (R$)</label>
+          <input id="cKiwifyFixed" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="cHotmartPct">Hotmart — taxa (%)</label>
+          <input id="cHotmartPct" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="cHotmartFixed">Hotmart — fixo (R$)</label>
+          <input id="cHotmartFixed" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="cEduzzPct">Eduzz — taxa (%)</label>
+          <input id="cEduzzPct" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="cEduzzFixed">Eduzz — fixo (R$)</label>
+          <input id="cEduzzFixed" type="number" inputmode="decimal" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="field">
+        <label for="cSaqueFee">Taxa de saque padrão (R$)</label>
+        <input id="cSaqueFee" type="number" inputmode="decimal" min="0" step="0.01">
+      </div>
+      <button id="btnSaveConfig" class="primary big" type="button">Salvar ajustes</button>
+    </div>
+
+    <div class="card">
+      <h2>Backup</h2>
+      <p class="muted">Exporte o backup em JSON e guarde. Para restaurar ou juntar outro aparelho, cole o JSON (ou escolha o arquivo) e toque em Importar — a importação junta por id e nunca apaga o que já existe.</p>
+      <div class="row gap">
+        <button id="btnExport" class="big grow" type="button">Exportar backup</button>
+        <button id="btnImport" class="big grow" type="button">Importar / juntar</button>
+      </div>
+      <div class="field mt">
+        <label for="backupFile">Arquivo de backup</label>
+        <input id="backupFile" type="file" accept=".json,application/json">
+      </div>
+      <div class="field">
+        <label for="backupText">JSON do backup</label>
+        <textarea id="backupText" rows="6" placeholder="O backup exportado aparece aqui; ou cole um backup para importar."></textarea>
+      </div>
+    </div>
+    <div class="app-version"></div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <button id="tab-home" class="on" type="button">🏠<span>Início</span></button>
+  <button id="tab-vendas" type="button">🛒<span>Vendas</span></button>
+  <button id="tab-anuncios" type="button">📣<span>Anúncios</span></button>
+  <button id="tab-despesas" type="button">💸<span>Despesas</span></button>
+  <button id="tab-ajustes" type="button">⚙️<span>Ajustes</span></button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
