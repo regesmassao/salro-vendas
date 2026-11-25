@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chegada ao Japão sem perrengue — Miniguia</title>
+<meta name="description" content="O miniguia de quem já fez a mudança Brasil → Japão duas vezes: quanto dinheiro trazer, os documentos certos e os primeiros 14 dias resolvidos. Para quem vai morar e trabalhar no Japão — não é guia de turismo.">
+<style>
+  :root{
+    --marinho:#091835; --marinho-tela:#1B2A4A; --creme:#FBE5BF; --papel:#F7F3EA;
+    --tan:#CD9264; --texto:#22304d; --suave:#5a6a8a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--papel);color:var(--texto);line-height:1.6;font-size:17px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  /* HERO */
+  .hero{background:linear-gradient(160deg,var(--marinho) 0%,var(--marinho-tela) 100%);color:var(--creme);padding:52px 0 44px;text-align:left}
+  .eyebrow{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--tan);font-weight:700;margin-bottom:16px}
+  .hero h1{font-size:36px;line-height:1.15;font-weight:800;margin-bottom:14px}
+  .hero .sub{font-size:19px;font-weight:600;color:#fff;margin-bottom:14px;line-height:1.4}
+  .hero p{color:#d8deeb;font-size:16.5px;margin-bottom:26px}
+  .cta{display:block;text-align:center;background:var(--tan);color:var(--marinho);font-weight:800;font-size:18px;padding:16px 22px;border-radius:12px;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .cta:active{transform:scale(.99)}
+  .micro{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;font-size:13px;color:#aeb9d2}
+  .micro span{background:rgba(255,255,255,.08);padding:5px 10px;border-radius:999px}
+  /* SEÇÕES */
+  section{padding:40px 0 8px}
+  h2{font-size:24px;line-height:1.25;color:var(--marinho);margin-bottom:16px;font-weight:800}
+  p{margin-bottom:14px}
+  .card{background:#fff;border:1px solid #e7dfcd;border-radius:14px;padding:20px;margin-bottom:16px}
+  .warn{border:2px solid #c0392b;background:#fdf1ef}
+  .warn strong{color:#c0392b}
+  .ok{border:2px solid #2e7d4f;background:#eef7f1}
+  .ok strong{color:#2e7d4f}
+  .versus{display:grid;gap:14px}
+  .versus .card{margin-bottom:0}
+  .ano{font-weight:800;font-size:15px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .ruim .ano{color:#c0392b}.bom .ano{color:#2e7d4f}
+  /* CONTEÚDO */
+  .conteudo{background:var(--marinho);color:#e8ecf5;margin-top:40px;padding:40px 0 30px}
+  .conteudo h2{color:var(--creme)}
+  .parte{background:var(--marinho-tela);border:1px solid rgba(251,229,191,.18);border-radius:14px;padding:20px;margin-bottom:14px}
+  .parte h3{color:var(--tan);font-size:17px;margin-bottom:10px}
+  .parte ul{list-style:none}
+  .parte li{padding:5px 0 5px 26px;position:relative;font-size:15.5px;color:#d8deeb}
+  .parte li::before{content:"✓";position:absolute;left:0;color:var(--tan);font-weight:800}
+  .bonus{border:1px dashed var(--tan)}
+  /* BENEFÍCIOS */
+  .beneficios ul{list-style:none}
+  .beneficios li{background:#fff;border:1px solid #e7dfcd;border-radius:12px;padding:14px 16px 14px 44px;position:relative;margin-bottom:10px;font-size:16px}
+  .beneficios li::before{content:"✓";position:absolute;left:16px;top:14px;color:#2e7d4f;font-weight:800;font-size:18px}
+  .fecho{font-weight:700;color:var(--marinho);font-size:17.5px}
+  /* PREÇO */
+  .preco{background:#fff;border:2px solid var(--marinho);border-radius:16px;padding:26px 22px;text-align:center;margin-bottom:16px}
+  .preco .valor{font-size:44px;font-weight:800;color:var(--marinho);line-height:1}
+  .preco .cond{color:var(--suave);font-size:15px;margin:8px 0 18px}
+  /* GARANTIA */
+  .garantia{background:#f3e3cb;border-radius:14px;padding:22px;text-align:center;margin-bottom:16px}
+  .garantia .selo{font-size:30px}
+  .garantia h2{margin-bottom:8px}
+  /* FAQ */
+  details{background:#fff;border:1px solid #e7dfcd;border-radius:12px;padding:16px 18px;margin-bottom:10px}
+  summary{font-weight:700;color:var(--marinho);cursor:pointer;font-size:16.5px}
+  details p{margin:10px 0 2px;font-size:15.5px;color:var(--texto)}
+  /* FOOTER */
+  footer{padding:34px 0 110px;text-align:center;color:var(--suave);font-size:13.5px}
+  footer .marca{font-weight:800;letter-spacing:2px;color:var(--marinho)}
+  /* CTA FIXO */
+  .sticky{position:fixed;left:0;right:0;bottom:0;background:var(--marinho);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;z-index:50;box-shadow:0 -4px 18px rgba(0,0,0,.25)}
+  .sticky .pv{color:var(--creme);font-weight:800;font-size:19px;white-space:nowrap}
+  .sticky .pv small{display:block;font-size:11px;font-weight:600;color:#aeb9d2}
+  .sticky a{flex:1;text-align:center;background:var(--tan);color:var(--marinho);font-weight:800;padding:13px 10px;border-radius:10px;text-decoration:none;font-size:16px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Miniguia · Salro Guias</div>
+    <h1>Chegada ao Japão sem perrengue</h1>
+    <div class="sub">O miniguia de quem já fez essa mudança duas vezes — e pagou caro pelos erros da primeira.</div>
+    <p>Chegue ao Japão com o dinheiro certo, os documentos certos e os primeiros 14 dias resolvidos: o que fazer antes de embarcar, a ordem exata dos primeiros dias e como não cair nas armadilhas da primeira moradia. Com valores reais, de quem vive isso hoje.</p>
+    <a class="cta" href="https://pay.kiwify.com.br/tS1xE5X">Quero chegar sem perrengue →</a>
+    <div class="micro"><span>Pagamento único</span><span>Acesso imediato</span><span>7 dias de garantia</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Para quem é — e para quem NÃO é</h2>
+    <div class="card ok">
+      <p style="margin:0"><strong>É para você</strong> se o seu plano é <strong>morar e trabalhar</strong> no Japão: mudar de país, começar um emprego, construir a vida aqui.</p>
+    </div>
+    <div class="card warn">
+      <p style="margin:0"><strong>NÃO é para turistas.</strong> Se a sua viagem é de passeio — hotel, roteiro de pontos turísticos, quantos dias em cada cidade — <strong>não compre</strong>: aqui não tem roteiro de viagem, tem mudança de vida. Quem comprar esperando turismo vai se decepcionar, e eu prefiro te dizer isso agora.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>O problema que ele resolve</h2>
+    <p>A maioria dos brasileiros que chega ao Japão perde dinheiro e tempo nas mesmas armadilhas: traz dinheiro a menos, descobre documento faltando já no balcão, tenta alugar apartamento antes da hora e só entende os custos reais da mudança quando já assinou.</p>
+    <p>Eu sei porque passei pelas duas versões:</p>
+    <div class="versus">
+      <div class="card ruim">
+        <div class="ano">Em 2022 — sem plano</div>
+        <p style="margin:0">Cheguei com US$ 2.000 achando que bastavam. Não bastaram: o primeiro salário só veio 60 dias depois, o dinheiro acabou no meio do caminho e eu segurei a barra fazendo arubaito (bico) em todos os fins de semana e feriados — trabalhei todos os dias do Golden Week.</p>
+      </div>
+      <div class="card bom">
+        <div class="ano">Em 2026 — com plano</div>
+        <p style="margin:0">Voltei trazendo US$ 5.000 e um plano. Bastaram. <strong>Este miniguia é esse plano, escrito de forma direta.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="conteudo">
+  <div class="wrap">
+    <h2>O que você recebe</h2>
+    <p style="color:#d8deeb">Acesso imediato na área de membros, com o conteúdo dividido em módulos e <strong>atualizações futuras incluídas</strong> — comprou uma vez, baixa a versão nova sempre que sair:</p>
+
+    <div class="parte">
+      <h3>Parte 1 — Antes de embarcar</h3>
+      <ul>
+        <li>Quanto dinheiro trazer: a conta honesta, pensando no pior prazo de salário (o meu demorou 60 dias)</li>
+        <li>Sair do Brasil sem dívidas e com as contas organizadas</li>
+        <li>A procuração que me salvou (vendi até o carro à distância)</li>
+        <li>Documentos e traduções — incluindo o erro da CNH que você não precisa repetir</li>
+        <li>O status de residência (teijusha e os demais) explicado sem juridiquês</li>
+        <li>O caminho realista da moradia: por que quem chega não aluga por conta própria, a escada do visto (1 ano → +1 ano → 3 anos) e quando o aluguel por conta destrava</li>
+      </ul>
+    </div>
+
+    <div class="parte">
+      <h3>Parte 2 — Os primeiros 14 dias</h3>
+      <ul>
+        <li>A ordem que destrava tudo: prefeitura → hanko → banco → celular</li>
+        <li>Conta no JP Post só com zairyu card, passaporte e hanko</li>
+        <li>O erro do celular de 2022 (e como chegar já conectado)</li>
+      </ul>
+    </div>
+
+    <div class="parte">
+      <h3>Parte 3 — Primeira moradia sem cair em armadilha</h3>
+      <ul>
+        <li>Empreiteira ou por conta própria: os dois lados, com o preço real de cada um</li>
+        <li>Os custos iniciais item a item — no meu caso, ¥514.330 para entrar no apartamento em Yokohama</li>
+        <li>A análise (shinsa), o contato de emergência e a empresa garantidora</li>
+      </ul>
+    </div>
+
+    <div class="parte bonus">
+      <h3>Bônus — as duas colas</h3>
+      <ul>
+        <li>Checklist de saída do Brasil (imprimível)</li>
+        <li>Checklist dos primeiros 14 dias (imprimível)</li>
+        <li>Entrada na lista de espera do Manual do Brasileiro no Japão (o guia completo, 12 capítulos) com desconto de lançamento</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="beneficios">
+  <div class="wrap">
+    <h2>Como este miniguia te ajuda na prática</h2>
+    <ul>
+      <li>Você sabe exatamente quanto dinheiro trazer — e não passa o aperto de esperar até 60 dias pelo primeiro salário</li>
+      <li>Você embarca com os documentos certos e não trava no balcão da prefeitura, do banco ou da operadora</li>
+      <li>Nos primeiros 14 dias você sabe a ordem de tudo — prefeitura → hanko → banco → celular — sem perder dia nem voltar duas vezes ao mesmo lugar</li>
+      <li>Você entende os custos reais de morar por conta própria ANTES de assinar qualquer contrato, sem surpresa no fim do mês</li>
+      <li>Você não cai nas armadilhas da primeira moradia: entende quando a empreiteira é o caminho certo e quando já dá pra sair dela</li>
+      <li>Você sai do Brasil com a vida resolvida — contas, dívidas e procuração — sem deixar nada pendurado pra trás</li>
+    </ul>
+    <p class="fecho">No fim, é simples: você troca o improviso dos primeiros meses por um plano. Chega sabendo o que fazer, quanto custa e qual é o próximo passo.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="preco">
+      <div class="valor">R$ 47</div>
+      <div class="cond">Pagamento único, via Pix ou cartão. Sem mensalidade.<br>As atualizações do miniguia estão incluídas.</div>
+      <a class="cta" href="https://pay.kiwify.com.br/tS1xE5X">Quero chegar sem perrengue →</a>
+    </div>
+    <div class="garantia">
+      <div class="selo">🛡️</div>
+      <h2>7 dias de garantia incondicional</h2>
+      <p style="margin:0">Pela própria plataforma: se não for para você, pede o reembolso dentro do prazo e recebe tudo de volta, sem perguntas e sem formulário escondido.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Perguntas frequentes</h2>
+    <details>
+      <summary>É um guia de turismo?</summary>
+      <p>Não. É para quem vai morar e trabalhar no Japão. Para turismo, ele não serve — de propósito.</p>
+    </details>
+    <details>
+      <summary>Já moro no Japão. Serve para mim?</summary>
+      <p>A Parte 3 (moradia por conta própria, custos reais, análise) foi feita para quem já estabilizou e quer sair do apartamento da empreiteira. As Partes 1 e 2 são para quem ainda vai embarcar.</p>
+    </details>
+    <details>
+      <summary>Preciso já ter o visto aprovado?</summary>
+      <p>Não. A Parte 1 ajuda justamente quem está se preparando — dinheiro, documentos e o caminho do status de residência entram antes do embarque.</p>
+    </details>
+    <details>
+      <summary>Como recebo depois de pagar?</summary>
+      <p>A plataforma libera seu acesso à área de membros na hora: você entra com seu login, lê/baixa os módulos e recebe as atualizações por e-mail.</p>
+    </details>
+    <details>
+      <summary>Quem escreveu?</summary>
+      <p>Um brasileiro que mora e trabalha no Japão e fez essa mudança duas vezes (2022 e 2026). Nada aqui é teoria copiada: são os meus números, os meus erros e o que funcionou na prática.</p>
+    </details>
+    <a class="cta" href="https://pay.kiwify.com.br/tS1xE5X" style="margin-top:18px">Quero chegar sem perrengue →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="marca">SALRO</div>
+    <p>Produto digital · Acesso imediato após o pagamento<br>© 2026 Salro Guias</p>
+  </div>
+</footer>
+
+<div class="sticky">
+  <div class="pv">R$ 47<small>pagamento único</small></div>
+  <a href="https://pay.kiwify.com.br/tS1xE5X">Quero chegar sem perrengue →</a>
+</div>
+
+</body>
+</html>
